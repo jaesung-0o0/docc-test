@@ -34,7 +34,7 @@ jobs:
       with:
         target: TheBlog
         output: ./public
-        hosting-base-path: theblog
+        hosting-base-path: docc-test
         transform-for-static-hosting: 'true'
         disable-indexing: 'true'
     - name: Upload artifact
