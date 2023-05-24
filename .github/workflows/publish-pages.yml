@@ -22,31 +22,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
+  docs:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Pages
+      uses: actions/configure-pages@v1
+    - name: Set up Swift
+      uses: fwal/setup-swift@v1
+      with:
+        swift-version: '5.7.1'
+    - name: Generate Docs
+      uses: fwcd/swift-docc-action@v1
+      with:
+        target: TheBlog
+        output: ./public
+        hosting-base-path: docc-test
+        transform-for-static-hosting: 'true'
+        disable-indexing: 'true'
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: ./public
+
   deploy:
     environment:
-      # Must be set to this for deploying to GitHub Pages
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-12
+    runs-on: ubuntu-latest
+    needs: docs
+
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3
-      - name: Build DocC
-        run: |
-          xcodebuild docbuild -scheme TheBlog \
-            -derivedDataPath /tmp/docbuild \
-            -destination 'generic/platform=iOS';
-          $(xcrun --find docc) process-archive \
-            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/TheBlog.doccarchive \
-            --hosting-base-path docc-test \
-            --output-path docs;
-          echo "<script>window.location.href += \"/documentation/theblog\"</script>" > docs/index.html;
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload only docs directory
-          path: 'docs'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+    - name: Deploy Docs
+      uses: actions/deploy-pages@v1
