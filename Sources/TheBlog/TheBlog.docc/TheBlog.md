@@ -42,9 +42,12 @@ struct Sightseeing: Activity {
 
 ## Topics
 
+### The Composable Architecture
+
+- <doc:/TCA/02_이벤트_발생_시_Action_State_Reducer_동작과정>
+
 ### Creating sloths
 
-- ``SlothGenerator``
 - ``NameGenerator``
 - ``Habitat``
 
